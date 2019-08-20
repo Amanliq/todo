@@ -1,32 +1,32 @@
 <template>
     <div class="container">
-        <app-top class="p-3" @filterStatus="search">
+        <app-top class="p-3">
             <input type="text" slot="search"
-             class="form-control" placeholder="SearchByName" v-model="filter">
+             class="form-control" placeholder="SearchByName" @input="filterByname($event)">
         </app-top>
 
         <table class="table-bordered table text-center">
             <thead>
-                <th>Name {{pagTotal}}</th>
-                <th>Todo</th>
-                <th>Staus</th>
+                <th>Name {{pagesTotal}}</th>
+                <th>Todo{{current}}</th>
+                <th>Status</th>
                 <th>Created_date</th>
                 <th>Deadline</th>
                 <th>Actions</th>
             </thead>
             <tbody>
-                <app-table v-for="(todo,index) in  paginatedData " 
+                <app-table v-for="(todo,index) in allfiltered" 
                 :key="index" :todo="todo" 
                 @trash="trash">    
                 </app-table>
             </tbody>
         </table>
-        <ul class="pagination" v-if="paginatedData.length>0">
+        <ul class="pagination" >
             <li class="page-item" 
             ><a class="page-link" @click.prevent="prev" href="#">Prev</a></li>
             <app-pagination 
-            v-for="pag in pagTotal" :key="pag"
-            :pag="pag" @setPage="setPage" :current="current">
+            v-for="pag in pagesTotal" :key="pag"
+            :pag="pag"  :current="current">
             </app-pagination>
             <li class="page-item"
             ><a class="page-link" @click.prevent="next" href="#">Next</a></li>
@@ -48,10 +48,6 @@ export default {
         return {
             showModalDel: null,
             idDel: null,
-            id: 0,
-            filter:'',
-            paginate: 5,
-            current: 0,
         }
     },
     components: {
@@ -61,53 +57,34 @@ export default {
         'app-pagination' : Pagination
     },
     computed: {
-        searchByName() {
-            return this.filtered.filter(todo => {
-                return todo.name.toLowerCase().includes(this.filter.toLowerCase())
-            })
-        },
-        todos() {
-            return this.$store.getters.data
-        },
-        filtered() {
-            return this.id == 0 ? this.todos : this.todos.filter(i => i.status.id == this.id)
-        },
         allfiltered() {
-           return this.searchByName
+            return this.$store.getters.paginatedData
         },
-        paginatedData() {
-            const start  = this.current * this.paginate, 
-                    end = start + this.paginate
-            return this.allfiltered.slice(start, end)
+        current() {
+            return this.$store.getters.current
         },
-        pagTotal() {
-            return Math.ceil(this.allfiltered.length / this.paginate)
+        pagesTotal() {
+            return this.$store.getters.pagesTotal
         }
-        
-    }, 
+    },  
     methods: {
-        setPage(page) {
-            this.current = page-1  
-        },
-        next() {
-            if(this.pagTotal-1 > this.current) this.current++
-        },
-        prev() {
-            if(this.current > 0) this.current--
-        },
+        // next() {
+        //     if(this.pagTotal-1 > this.current) this.current++
+        // },
+        // prev() {
+        //     if(this.current > 0) this.current--
+        // },
         trash(event) {
             this.showModalDel = true
             this.idDel = event
-           
         },
         deleteById() {
             this.$store.dispatch('deleteById', this.idDel)
             .then(() => this.showModalDel = false)
         },
-        search(id) {
-            this.id = id
-        },
-       
+        filterByname(i) {
+            this.$store.dispatch('filterSearch', i.target.value)
+        }
     }
 }
 </script>

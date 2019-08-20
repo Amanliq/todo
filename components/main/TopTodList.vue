@@ -32,8 +32,8 @@ export default {
     },
     methods: {
         onChange(st) {
-            // this.$store.dispatch('filterStatus', st.target.value)
-             this.$emit('filterStatus', st.target.value)
+            this.$store.dispatch('filterStatus', st.target.value)
+            //  this.$emit('filterStatus', st.target.value)
         }
     } 
 }

@@ -11,10 +11,10 @@
                 <input type="text" v-model="inputVal.dcp" class="form-control">
                 <br>
                 <label>Deadline date</label>
-                <input type="datetime-local"  v-model="inputVal.deadline"
+                <input type="date"  v-model="inputVal.deadline"
                 class="form-control">
                 <br>
-                <button class="btn btn-info">Add Item</button>
+                <button :disabled="inputVal.name == '' || inputVal.dcp == ''" class="btn btn-info">Add Item</button>
             </form>
 
         </div>
@@ -28,7 +28,7 @@ export default {
             form:{
                 name:'',
                 dcp: '',
-                deadline: '07.01.2019T08:10:00'
+                deadline: new Date().toISOString().slice(0,10)
             }
         }
     },
@@ -37,7 +37,9 @@ export default {
           return this.$route.params.id
       },
       updatatedTodo() {
-          return  this.$store.getters.data.filter(element => element.id == this.id)
+          return  this.$store.getters.data.filter(element => {
+              return element.id == this.id;
+          })
       },
       inputVal() {
           return this.id ? this.updatatedTodo[0] : this.form
